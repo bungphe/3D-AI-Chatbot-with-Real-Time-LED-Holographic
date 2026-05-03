@@ -8,8 +8,8 @@ Author: Ruslan Magana
 License: Apache 2.0
 """
 
+import argparse
 import sys
-import time
 from pathlib import Path
 from typing import Optional
 
@@ -313,6 +313,35 @@ class HolographicChatbot:
             self.logger.error(f"Error during cleanup: {e}")
 
 
+def build_parser() -> argparse.ArgumentParser:
+    """Create and configure CLI parser."""
+    parser = argparse.ArgumentParser(
+        prog="holographic-chatbot",
+        description="Interactive 3D AI chatbot with holographic LED fan integration.",
+    )
+    parser.add_argument(
+        "--test",
+        action="store_true",
+        help="Run system checks for all components and exit.",
+    )
+    parser.add_argument(
+        "--prompt",
+        type=str,
+        help="Process a single prompt and print the chatbot response.",
+    )
+    parser.add_argument(
+        "--no-animation",
+        action="store_true",
+        help="Disable animation generation/fan streaming for this run.",
+    )
+    parser.add_argument(
+        "--no-audio",
+        action="store_true",
+        help="Disable text-to-speech synthesis for this run.",
+    )
+    return parser
+
+
 def main() -> int:
     """
     Main entry point for the application.
@@ -321,22 +350,24 @@ def main() -> int:
         int: Exit code (0 for success, 1 for error)
     """
     try:
+        args = build_parser().parse_args()
+
         # Create and run the chatbot
         bot = HolographicChatbot()
 
-        # Check for command-line arguments
-        if len(sys.argv) > 1:
-            if sys.argv[1] == "--test":
-                # Run system tests
-                success = bot.test_system()
-                return 0 if success else 1
+        if args.test:
+            success = bot.test_system()
+            return 0 if success else 1
 
-            elif sys.argv[1] == "--help":
-                print("Holographic Chatbot - Usage:")
-                print("  holographic-chatbot              Run in interactive mode")
-                print("  holographic-chatbot --test       Run system tests")
-                print("  holographic-chatbot --help       Show this help")
-                return 0
+        if args.prompt:
+            response = bot.process_user_input(
+                args.prompt,
+                animate=not args.no_animation,
+                synthesize_audio=not args.no_audio,
+            )
+            print(response)
+            bot.cleanup()
+            return 0
 
         # Default: run interactive mode
         bot.interactive_mode()
