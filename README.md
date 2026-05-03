@@ -150,6 +150,17 @@ python -m holographic_chatbot.main
 holographic-chatbot --test
 ```
 
+#### One-shot Mode (non-interactive)
+
+```bash
+holographic-chatbot --prompt "Hãy giới thiệu ngắn về hệ thống 3D AI Chatbot"
+```
+
+Optional flags:
+
+- `--no-animation`: skip 3D animation rendering and fan streaming
+- `--no-audio`: skip text-to-speech generation
+
 ### 3. Example Session
 
 ```
